@@ -95,7 +95,7 @@ def parse_page(page):
       item['uid'] = str(uid)
       item['subtitle'] = line.replace('-', '').strip()
     elif line.startswith('`'):
-      item['title'] = line.replace('`', '').strip()
+      item['title'] = line.replace('`', '').replace('{{', '').replace('}}', '').replace(' ', '  ').strip()
       rowList.append(item)
 
     uid += 1
@@ -195,6 +195,6 @@ def parse_args(query=''):
     elif opt == '-o':
       dic['platform'] = arg
 
-  dic['command'] = ''.join(args)
+  dic['command'] = '-'.join(args)
 
   return dic
