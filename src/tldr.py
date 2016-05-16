@@ -60,7 +60,8 @@ def find_page_location(command):
     index = json.load(f)
   command_list = [item['name'] for item in index['commands']]
   if command not in command_list:
-    return
+    return os.path.join(os.path.join(repo_directory, 'pages'),
+                    os.path.join("common", command + '.md'))
 
   supported_platforms = index['commands'][
     command_list.index(command)]['platform']
@@ -104,7 +105,7 @@ def parse_page(page):
 
 def parse_man_page(command):
   page_path = find_page_location(command)
-  if page_path:
+  if page_path and os.path.exists(page_path):
     return parse_page(page_path)
 
   return []
