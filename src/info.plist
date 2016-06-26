@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>bundleid</key>
-	<string>com.chedanji.www</string>
+	<string>com.chedanji.tldr</string>
 	<key>connections</key>
 	<dict>
 		<key>6C68D0BB-A89A-4FDD-BB99-B5A5B460646E</key>
@@ -15,6 +15,8 @@
 				<integer>0</integer>
 				<key>modifiersubtext</key>
 				<string></string>
+				<key>vitoclose</key>
+				<false/>
 			</dict>
 		</array>
 	</dict>
@@ -31,6 +33,25 @@
 		<dict>
 			<key>config</key>
 			<dict>
+				<key>autopaste</key>
+				<false/>
+				<key>clipboardtext</key>
+				<string></string>
+				<key>transient</key>
+				<false/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.output.clipboard</string>
+			<key>uid</key>
+			<string>6E0218F7-A9BA-4D40-A79A-4C33BCCE8431</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>alfredfiltersresults</key>
+				<false/>
 				<key>argumenttype</key>
 				<integer>1</integer>
 				<key>escaping</key>
@@ -50,6 +71,12 @@
 				<key>script</key>
 				<string>import tldr
 tldr.query('{query}')</string>
+				<key>scriptargtype</key>
+				<integer>0</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>subtext</key>
+				<string></string>
 				<key>title</key>
 				<string>tldr</string>
 				<key>type</key>
@@ -62,22 +89,7 @@ tldr.query('{query}')</string>
 			<key>uid</key>
 			<string>6C68D0BB-A89A-4FDD-BB99-B5A5B460646E</string>
 			<key>version</key>
-			<integer>0</integer>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
-				<key>autopaste</key>
-				<false/>
-				<key>clipboardtext</key>
-				<string></string>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.output.clipboard</string>
-			<key>uid</key>
-			<string>6E0218F7-A9BA-4D40-A79A-4C33BCCE8431</string>
-			<key>version</key>
-			<integer>0</integer>
+			<integer>2</integer>
 		</dict>
 	</array>
 	<key>readme</key>
@@ -86,13 +98,17 @@ tldr.query('{query}')</string>
 	<dict>
 		<key>6C68D0BB-A89A-4FDD-BB99-B5A5B460646E</key>
 		<dict>
+			<key>xpos</key>
+			<integer>90</integer>
 			<key>ypos</key>
-			<real>60</real>
+			<integer>70</integer>
 		</dict>
 		<key>6E0218F7-A9BA-4D40-A79A-4C33BCCE8431</key>
 		<dict>
+			<key>xpos</key>
+			<integer>600</integer>
 			<key>ypos</key>
-			<real>60</real>
+			<integer>70</integer>
 		</dict>
 	</dict>
 	<key>webaddress</key>

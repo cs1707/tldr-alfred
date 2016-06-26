@@ -11,6 +11,7 @@ import io
 import json
 import getopt
 import datetime
+import urllib2
 
 alfred_workflow_data = os.environ['alfred_workflow_data']
 repo_directory = alfred_workflow_data + '/tldr'
@@ -27,7 +28,7 @@ def query(query):
 
   if bool(isUpdate):
     update()
-    outputTitle('Update success')
+    output_title('Update success')
   else:
     update(7)
 
@@ -41,7 +42,10 @@ def query(query):
       'valid': 'no'
     }]
   else:
+    # output_title(command)
     rowList = parse_man_page(command)
+    if(len(rowList) == 0):
+      rowList = hint(command, default_platform)
     if(len(rowList) == 0):
       rowList = [{
         'uid': '1',
@@ -51,7 +55,7 @@ def query(query):
         'title': 'Page not found',
         'valid': 'no'
       }]
-  print genXML(rowList)
+  print gen_xml(rowList)
 
 def find_page_location(command):
 
@@ -88,15 +92,15 @@ def parse_page(page):
   for line in lines:
     if line.startswith('#'):
       continue
-    elif line.startswith('>'):
-      description['title'] = line.replace('>', '').strip()
-      description['uid'] = str(uid)
+    # elif line.startswith('>'):
+    #   description['title'] = line.replace('>', '').strip()
+    #   description['uid'] = str(uid)
     elif line.startswith('-'):
       item = {}
       item['uid'] = str(uid)
-      item['subtitle'] = line.replace('-', '').strip()
+      item['subtitle'] = line.replace('-', '').replace(':', '').strip()
     elif line.startswith('`'):
-      item['title'] = line.replace('`', '').replace('{{', '').replace('}}', '').replace(' ', '  ').strip()
+      item['title'] = line.replace('`', '').replace('{{', '').replace('}}', '').strip()
       rowList.append(item)
 
     uid += 1
@@ -110,12 +114,12 @@ def parse_man_page(command):
 
   return []
 
-def genXML(rowList):
+def gen_xml(rowList):
   items = Element('items')
 
   for row in rowList:
     item = SubElement(items, 'item')
-    item.set('autocomplete', row.get('title') or '')
+    item.set('autocomplete', row.get('autocomplete') or '')
     item.set('uid', row.get('uid') or '')
     item.set('arg', row.get('title') or '')
     item.set('valid', row.get('valid') or '')
@@ -132,8 +136,8 @@ def genXML(rowList):
   tree = minidom.parseString(etree.tostring(items))
   return tree.toxml()
 
-def outputTitle(msg):
-  print genXML([{
+def output_title(msg):
+  print gen_xml([{
         'uid': str(time.time()),
         'arg': '',
         'autocomplete': '',
@@ -149,6 +153,7 @@ def clone():
   if(not os.path.exists(repo_directory)):
     child = subprocess.Popen(['git clone https://github.com/tldr-pages/tldr.git ' + '"' + str(repo_directory) + '"'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     success, err = child.communicate()
+    download_index()
 
 def update(days=0):
 
@@ -177,6 +182,8 @@ def update(days=0):
       'update_date': datetime.datetime.now().strftime('%Y%m%d')
     }
     json.dump(data, f)
+    download_index()
+
 
 def parse_args(query=''):
   query = query.split()
@@ -199,3 +206,40 @@ def parse_args(query=''):
   dic['command'] = '-'.join(args)
 
   return dic
+
+
+def download_index():
+  url = 'https://tldr-pages.github.io/assets/index.json'
+  try:
+    res = urllib2.urlopen(url)
+  except urllib2.HTTPError,e:
+    print(e)
+    return
+  with io.open(os.path.join(repo_directory, 'pages/index.json'), mode='wb') as f:
+    f.write(res.read())
+
+def hint(command, platform=''):
+  if (len(command) == 0):
+    return []
+
+  with io.open(os.path.join(repo_directory, 'pages/index.json'),
+               encoding='utf-8') as f:
+    index = json.load(f)
+
+  result = []
+  for item in index['commands']:
+    if (platform in item['platform'] or 'common' in item['platform']) and command == item['name'][0: len(command)]:
+      if platform == 'osx':
+        autocomplete = item['name']
+      elif len(platform) > 0:
+        autocomplete = item['name'] + ' -o ' + platform
+
+      result.append({
+        'uid': str(time.time()),
+        'arg': '',
+        'autocomplete': autocomplete,
+        'icon': 'icon.png',
+        'title': item['name'],
+        'valid': 'no'
+      })
+  return result
