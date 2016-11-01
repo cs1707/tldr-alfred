@@ -59,7 +59,7 @@ def query(query):
 
 def find_page_location(command):
 
-  with io.open(os.path.join(repo_directory, 'pages/index.json'),
+  with io.open(os.path.join(alfred_workflow_data, 'index.json'),
                encoding='utf-8') as f:
     index = json.load(f)
   command_list = [item['name'] for item in index['commands']]
@@ -153,10 +153,11 @@ def clone():
   if(not os.path.exists(repo_directory)):
     child = subprocess.Popen(['git clone https://github.com/tldr-pages/tldr.git ' + '"' + str(repo_directory) + '"'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     success, err = child.communicate()
+    if child.returncode:
+      raise Exception(err)
     download_index()
 
 def update(days=0):
-
   if days > 0 and os.path.exists(os.path.join(alfred_workflow_data, 'config.json')):
     with io.open(os.path.join(alfred_workflow_data, 'config.json'),
         encoding='utf-8') as f:
@@ -215,14 +216,14 @@ def download_index():
   except urllib2.HTTPError,e:
     print(e)
     return
-  with io.open(os.path.join(repo_directory, 'pages/index.json'), mode='wb') as f:
+  with io.open(os.path.join(alfred_workflow_data, 'index.json'), mode='wb') as f:
     f.write(res.read())
 
 def hint(command, platform=''):
   if (len(command) == 0):
     return []
 
-  with io.open(os.path.join(repo_directory, 'pages/index.json'),
+  with io.open(os.path.join(alfred_workflow_data, 'index.json'),
                encoding='utf-8') as f:
     index = json.load(f)
 
