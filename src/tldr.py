@@ -12,6 +12,7 @@ import json
 import getopt
 import datetime
 import urllib2
+import re
 
 alfred_workflow_data = os.environ['alfred_workflow_data']
 repo_directory = alfred_workflow_data + '/tldr'
@@ -85,27 +86,57 @@ def find_page_location(command):
 def parse_page(page):
   with io.open(page, encoding='utf-8') as f:
     lines = f.readlines()
-  rowList = []
+
+  if (len(lines) <= 0):
+    return []
+
+  first_line = lines[0]
+  if (first_line.startswith('#')):
+    return parse_old_page(lines)
+  else:
+    return parse_new_page(lines)
+
+def parse_old_page(lines):
+  row_list = []
   uid = 1
   item = {}
   description = {}
   for line in lines:
     if line.startswith('#'):
       continue
-    # elif line.startswith('>'):
-    #   description['title'] = line.replace('>', '').strip()
-    #   description['uid'] = str(uid)
     elif line.startswith('-'):
       item = {}
       item['uid'] = str(uid)
       item['subtitle'] = line.replace('-', '').replace(':', '').strip()
     elif line.startswith('`'):
       item['title'] = line.replace('`', '').replace('{{', '').replace('}}', '').strip()
-      rowList.append(item)
+      row_list.append(item)
 
     uid += 1
-  rowList.insert(0, description)
-  return rowList
+  return row_list
+
+def parse_new_page(lines):
+  row_list = []
+  uid = 1
+  item = {}
+  code_pattern = re.compile(r'^( {4,} | \t)')
+  subtext_pattern = re.compile(r'^\=?$')
+  for line in lines:
+    if (len(line.strip() == 0)):
+      continue
+    elif (code_pattern.match(line)):
+      item[title] = line.replace('{{', '').replace('}}', '').strip()
+      row_list.append(item)
+    elif (subtext_pattern.match(line.rstrip())):
+      continue
+    else:
+      item = {}
+      item['uid'] = str(uid)
+      item[subtitle] = line.strip()
+
+    uid += 1
+
+  return row_list
 
 def parse_man_page(command):
   page_path = find_page_location(command)
