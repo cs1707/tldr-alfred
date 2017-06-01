@@ -241,9 +241,10 @@ def parse_args(query=''):
 
 
 def download_index():
-  url = 'https://tldr-pages.github.io/assets/index.json'
+  url = 'http://tldr.sh/assets/index.json'
+  req = urllib2.Request(url, headers={'User-Agent' : "Magic Browser"})
   try:
-    res = urllib2.urlopen(url)
+    res = urllib2.urlopen(req)
   except urllib2.HTTPError,e:
     print(e)
     return
