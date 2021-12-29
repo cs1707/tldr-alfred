@@ -200,13 +200,13 @@ def update(days=0):
     if (datetime.datetime.now().date() - datetime.datetime.strptime(config['update_date'], '%Y%m%d').date()).days < days:
       return
   os.chdir(repo_directory)
-  local = subprocess.check_output('git rev-parse master'.split()).strip()
+  local = subprocess.check_output('git rev-parse main'.split()).strip()
   remote = subprocess.check_output(
     'git ls-remote https://github.com/tldr-pages/tldr/ HEAD'.split()
   ).split()[0]
 
   if local != remote:
-    subprocess.check_call('git checkout master'.split())
+    subprocess.check_call('git checkout main'.split())
     subprocess.check_call('git pull --rebase'.split())
 
   with io.open(os.path.join(alfred_workflow_data, 'config.json'), mode='wb') as f:
